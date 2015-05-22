@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+
+set(PROJECT_NAME Checkers)
+project(${PROJECT_NAME})
+
+IF(APPLE)
+    SET(GCC_CHAR_IS_UNSIGNED_CHAR "-funsigned-char")
+    SET(STD_C11 "-std=c++11 -stdlib=libc++")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+ENDIF (APPLE)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_CHAR_IS_UNSIGNED_CHAR} ${STD_C11}")
+
+
+#add_subdirectory(dep/glfw)
+
+add_subdirectory(CheckersEngine)
+
+set( gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" )
+add_subdirectory(dep/gtest-1.7.0)
+add_subdirectory(CheckersEngineTests)

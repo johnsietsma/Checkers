@@ -4,26 +4,10 @@
 #include <vector>
 
 #include "Move.h"
+#include "Piece.h"
 
 namespace checkers
 {
-
-struct Piece
-{
-    enum class PieceType { None, White, Black };
-
-    Piece() = default;
-    Piece( const PieceType& a_pieceType ) : pieceType(a_pieceType) {}
-
-    PieceType pieceType;
-    bool isKing;
-
-    /// Return the opponents piece type.
-    static PieceType GetOpponentPieceType( PieceType pieceType )  {
-        return pieceType == PieceType::White ? PieceType::Black : PieceType::White;
-    }
-
-};
 
 /**
  * Represents a logical CheckersBoard, including all the sqaures and the pieces on those squares.
@@ -51,18 +35,17 @@ public:
     SideType GetCurrentSide() const { return m_currentSide;  }
 
     /// Get the piece at the given position. Returns PieceType::None if ot of bounds.
-    Piece::PieceType GetPiece( const Pos &pos ) const;
+    Piece GetPiece( const Pos &pos ) const;
 
     /// Sets a piece at a given location.
-    // This is only public for testing purposes. use DoMove() instead.
-    void SetPiece( const Pos &pos, Piece::PieceType piece );
+    void SetPiece( const Pos &pos, const Piece& piece );
 
     /// Get all the jump moves that the current size can make.
     // The available legal moves are added to the given vector.
-    void GetJumpMoves( std::vector<Move>& jumpMoves ) const;
+    void GetJumpMoves( std::vector<Move> &jumpMoves ) const;
 
     /// Get all the jump moves that the current size can make from the given Pos.
-    void GetJumpMoves( const Pos& pos, std::vector<Move>& jumpMoves ) const;
+    void GetJumpMoves( const Pos &pos, std::vector<Move> &jumpMoves ) const;
 
     /// Returns whether the position is occupied. An out of bounds pos is considered occupied.
     bool IsOccupied( const Pos &pos ) const;
@@ -89,6 +72,9 @@ private:
     /// Checks for all move errors, but doesn't return an error if there is a jump available.
     MoveError GetMoveError_DontForceJumps( const Move &move ) const;
 
+    /// Returns true if the piece is on the far side of the board for its type.
+    bool IsOnLastRow( const Piece::PieceType &pieceType, const Pos &pos ) const;
+
     /// The current side whose turn it is to move.
     SideType m_currentSide;
 
@@ -100,13 +86,13 @@ private:
 
 };
 
-inline Piece::PieceType CheckersBoard::GetPiece( const Pos &pos ) const
+inline Piece CheckersBoard::GetPiece( const Pos &pos ) const
 {
     if ( IsOutOfBounds( pos ) ) { return Piece::PieceType::None; }
-    return m_pieces[PosToIndex( pos )].pieceType;
+    return m_pieces[PosToIndex( pos )];
 }
 
-inline void CheckersBoard::SetPiece( const Pos& pos, Piece::PieceType piece )
+inline void CheckersBoard::SetPiece( const Pos &pos, const Piece& piece )
 {
     if ( IsOutOfBounds( pos ) ) { assert( false && "Piece out of bounds" ); return; }
     m_pieces[PosToIndex( pos )] = piece;
@@ -130,9 +116,21 @@ inline bool CheckersBoard::IsOutOfBounds( const Pos &pos ) const
             pos.column >= NumberOfColumns;
 }
 
-inline bool CheckersBoard::CanMove( const Move& move ) const
+inline bool CheckersBoard::CanMove( const Move &move ) const
 {
     return GetMoveError( move ) == MoveError::None;
+}
+
+inline bool CheckersBoard::IsOnLastRow( const Piece::PieceType &pieceType, const Pos &pos ) const
+{
+    if ( pieceType == Piece::PieceType::White && pos.row == NumberOfRows - 1 ) {
+        return true;
+    }
+    else if ( pieceType == Piece::PieceType::Black && pos.row == 0 ) {
+        return true;
+    }
+
+    return false;
 }
 
 }

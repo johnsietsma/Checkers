@@ -44,9 +44,9 @@ TEST_F( DefaultBoardTest, test_is_out_of_bounds )
 
 TEST_F( DefaultBoardTest, test_get_piece )
 {
-    EXPECT_EQ( board.GetPiece( {0, 0} ), PieceType::None );
-    EXPECT_EQ( board.GetPiece( {0, 1} ), PieceType::White );
-    EXPECT_EQ( board.GetPiece( {0, -1} ), PieceType::None ); // Out of bounds
+    EXPECT_EQ( board.GetPiece( {0, 0} ).pieceType, PieceType::None );
+    EXPECT_EQ( board.GetPiece( {0, 1} ).pieceType, PieceType::White );
+    EXPECT_EQ( board.GetPiece( {0, -1} ).pieceType, PieceType::None ); // Out of bounds
 }
 
 
@@ -205,7 +205,13 @@ TEST_F( EmptyBoardTest, test_multi_jump )
 
 TEST_F( EmptyBoardTest, test_make_a_king )
 {
+    Pos p1{ CheckersBoard::NumberOfRows-2, 0 };
+    Pos p2{ CheckersBoard::NumberOfRows-1, 1 };
 
+    board.SetPiece(p1, PieceType::White);
+    EXPECT_FALSE( board.GetPiece(p1).isKing );
+    board.DoMove( Move { p1, p2 } );
+    EXPECT_TRUE( board.GetPiece(p2).isKing );
 }
 
 TEST_F( EmptyBoardTest, test_king_moving_backwards )

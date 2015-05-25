@@ -14,6 +14,7 @@ add_library(${LIBRARY_NAME}
   CheckersBoard.h
   CheckersBoard.cpp
   Move.h
+  Piece.h
   Pos.h
 )
 

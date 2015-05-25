@@ -23,7 +23,7 @@ CheckersBoard::CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideT
 {
     for( int i=0; i<NumberOfSquares; i++ )
     {
-    	m_pieces[i].pieceType = pieceTypes[i];
+        m_pieces[i].pieceType = pieceTypes[i];
     }
 }
 
@@ -73,7 +73,7 @@ CheckersBoard::MoveError CheckersBoard::GetMoveError_DontForceJumps( const check
     if ( !move.from.IsDiagonal( move.to ) ) { return MoveError::IsNotDiagonal; }
 
     // Check we're moving the right color piece
-    PieceType pieceType = GetPiece( move.from );
+    PieceType pieceType = GetPiece( move.from ).pieceType;
     if ( pieceType == PieceType::White && GetCurrentSide() != SideType::White ) { return MoveError::WrongSide; }
     if ( pieceType == PieceType::Black && GetCurrentSide() != SideType::Black ) { return MoveError::WrongSide; }
 
@@ -101,23 +101,28 @@ CheckersBoard::MoveError CheckersBoard::GetMoveError_DontForceJumps( const check
 void CheckersBoard::DoMove( const Move &move )
 {
     if ( !CanMove( move ) ) { throw std::out_of_range( "Move is not allowed" ); }
-    PieceType piece = GetPiece( move.from );
+    Piece piece = GetPiece( move.from );
+
+    if( IsOnLastRow(piece.pieceType, move.to) ) {
+        piece.isKing = true;
+    }
 
     SetPiece( move.from, PieceType::None );
     SetPiece( move.to, piece );
+
 
     // Only swap if we can't jump again
     std::vector<Move> jumpMoves;
     GetJumpMoves( jumpMoves );
     if ( std::find_if( jumpMoves.begin(), jumpMoves.end(),
-    		[&move]( const Move & jumpMove )
-    		{
-    			return move.to == jumpMove.from; // A jump move is available from our to Pos.
-    		}
-    	) == jumpMoves.end()
+            [&move]( const Move & jumpMove )
+            {
+                return move.to == jumpMove.from; // A jump move is available from our to Pos.
+            }
+        ) == jumpMoves.end()
     )
     {
-       	m_currentSide = m_currentSide == SideType::White ? SideType::Black : SideType::Black;
+        m_currentSide = m_currentSide == SideType::White ? SideType::Black : SideType::Black;
     }
 }
 

@@ -7,10 +7,13 @@ struct Piece {
     enum class PieceType { None, White, Black };
 
     Piece() = default;
-    Piece( const PieceType &a_pieceType ) :
-        pieceType( a_pieceType ),
-        isKing(false)
+	Piece(PieceType a_pieceType) : Piece(a_pieceType,false)
     {}
+
+	Piece(PieceType a_pieceType, bool a_isKing) :
+		pieceType(a_pieceType),
+		isKing(a_isKing)
+	{}
 
     PieceType pieceType;
     bool isKing;

@@ -73,14 +73,15 @@ CheckersBoard::MoveError CheckersBoard::GetMoveError_DontForceJumps( const check
     if ( !move.from.IsDiagonal( move.to ) ) { return MoveError::IsNotDiagonal; }
 
     // Check we're moving the right color piece
-    PieceType pieceType = GetPiece( move.from ).pieceType;
+    Piece piece = GetPiece( move.from );
+	PieceType pieceType = piece.pieceType;
     if ( pieceType == PieceType::White && GetCurrentSide() != SideType::White ) { return MoveError::WrongSide; }
     if ( pieceType == PieceType::Black && GetCurrentSide() != SideType::Black ) { return MoveError::WrongSide; }
 
     // Check for backwards move
     int forwardDist = move.to.row - move.from.row;
-    if ( forwardDist > 0 && pieceType == PieceType::Black ) { return MoveError::IsBackwards; }
-    if ( forwardDist < 0 && pieceType == PieceType::White ) { return MoveError::IsBackwards; }
+    if ( !piece.isKing && forwardDist > 0 && pieceType == PieceType::Black ) { return MoveError::IsBackwards; }
+    if ( !piece.isKing && forwardDist < 0 && pieceType == PieceType::White ) { return MoveError::IsBackwards; }
 
     if ( move.IsAdjacentMove() ) {
         // We're moving to an adjacent diagonal sqaure

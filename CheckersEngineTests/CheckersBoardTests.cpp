@@ -230,7 +230,15 @@ TEST_F( EmptyBoardTest, test_make_a_king )
 
 TEST_F( EmptyBoardTest, test_king_moving_backwards )
 {
+	Move backwardsMove{ Pos{ 1, 1 }, Pos{ 0, 0 } };
 
+	// Place a plain piece
+	board.SetPiece(backwardsMove.from, Piece(PieceType::White, false));
+	EXPECT_EQ(board.GetMoveError(backwardsMove), CheckersBoard::MoveError::IsBackwards);
+
+	// Place a king piece
+	board.SetPiece(backwardsMove.from, Piece(PieceType::White, true));
+	EXPECT_EQ(board.GetMoveError(backwardsMove), CheckersBoard::MoveError::None);
 }
 
 TEST_F( EmptyBoardTest, test_king_jump )

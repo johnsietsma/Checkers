@@ -144,10 +144,10 @@ TEST_F(EmptyBoardTest, test_jumps_available)
 
 	board.SetPiece({ 0, 0 }, PieceType::White);
 	board.SetPiece({ 1, 1 }, PieceType::Black);
-	//EXPECT_EQ(1, board.GetJumpMoves().size());
+	EXPECT_EQ(1, board.GetJumpMoves().size());
 
 	board.SetPiece({ 2, 2 }, PieceType::Black);
-	//EXPECT_EQ(0, board.GetJumpMoves().size());
+	EXPECT_EQ(0, board.GetJumpMoves().size());
 }
 
 TEST_F(EmptyBoardTest, test_cant_move_if_jump_available)

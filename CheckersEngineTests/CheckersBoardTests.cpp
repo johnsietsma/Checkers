@@ -75,16 +75,16 @@ TEST(checkersboard_test, test_cant_move_out_of_bounds)
 
 TEST(checkersboard_test, test_cant_move_no_piece)
 {
-    PieceType initialPieces[64] = { PieceType::None };
-    CheckersBoard board(initialPieces);
+	PieceType initialPieces[64] {};
+    CheckersBoard board(initialPieces, CheckersBoard::SideType::White);
     EXPECT_EQ( board.GetMoveError( { {0,0}, {1,1} } ), CheckersBoard::MoveError::NoPieceToMove );
 }
 
 
 TEST(checkersboard_test, test_can_move_jump)
 {
-    PieceType initialPieces[64] = { PieceType::None };
-    CheckersBoard board(initialPieces);
+	PieceType initialPieces[64] {};
+    CheckersBoard board(initialPieces, CheckersBoard::SideType::White);
 
     board.SetPiece( {0,0}, PieceType::White );
     board.SetPiece( {1,1}, PieceType::Black );
@@ -96,10 +96,19 @@ TEST(checkersboard_test, test_can_move_jump)
 
 TEST(checkersboard_test, test_cant_move_wrong_side)
 {
-    CheckersBoard board;
-    Move move { {0,0}, {0,1} };
-    EXPECT_EQ( board.GetMoveError( move ), CheckersBoard::MoveError::None );
-    board.Move(move); // Changes the side
+	PieceType initialPieces[64] {};
+	CheckersBoard board;
+
+	board.SetPiece({ 0, 0 }, PieceType::White);
+	board.SetPiece({ 0, 1 }, PieceType::None);
+	Move move{ { 0, 0 }, { 0, 1 } };
+
+	board.Move(move); // Changes the side
+	EXPECT_EQ(board.GetMoveError(move), CheckersBoard::MoveError::None);
+
+	board.SetPiece({ 0, 0 }, PieceType::White);
+	board.SetPiece({ 0, 1 }, PieceType::None);
+
     EXPECT_EQ( board.GetMoveError( move ), CheckersBoard::MoveError::WrongSide );
 
 }

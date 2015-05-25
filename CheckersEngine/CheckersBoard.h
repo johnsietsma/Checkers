@@ -6,14 +6,19 @@
 
 namespace checkers {
 
-
-
+/**
+ * Defines a move from one square to another.
+ */
 struct Move
 {
     Pos from;
     Pos to;
 };
 
+/**
+ * Represents a CheckersBoard, including all the sqaures and the pieces on those squares.
+ * Defines operations for moving, get and setting pieces on square.
+ */
 class CheckersBoard
 {
 public:
@@ -26,15 +31,22 @@ public:
     const static int NumberOfColumns = 8;
     const static int NumberOfRows = 8;
 
-    CheckersBoard() : m_currentSide(SideType::White) {}
-    CheckersBoard( PieceType pieceTypes[NumberOfSquares] );
+	// The default starting positions of all the pieces.
+	static const PieceType DefaultPieceLayout[NumberOfSquares];
+
+	/**
+	 * Creates a new board with the default piece layout.
+	*/
+	CheckersBoard() : CheckersBoard(DefaultPieceLayout, SideType::White) {}
+
+    CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideType currentSide );
 
     PieceType GetPiece( Pos pos ) {
         if( IsOutOfBounds(pos) ) return PieceType::None;
         return m_pieces[PosToIndex(pos)];
     }
 
-    PieceType SetPiece( Pos pos, PieceType piece ) {
+    void SetPiece( Pos pos, PieceType piece ) {
         assert( !IsOutOfBounds(pos) );
         m_pieces[PosToIndex(pos)] = piece;
     }
@@ -80,7 +92,7 @@ public:
         PieceType piece = GetPiece( move.from );
         SetPiece( move.from, PieceType::None );
         SetPiece( move.to, piece );
-        m_currentSide = m_currentSide==Side::White ? Side::Black : Side::Black;
+        m_currentSide = m_currentSide==SideType::White ? SideType::Black : SideType::Black;
     }
 
 private:
@@ -88,16 +100,7 @@ private:
 
     SideType m_currentSide;
 
-    PieceType m_pieces[NumberOfSquares] = {
-        PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White,
-        PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,
-        PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White,
-        PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,
-        PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,  PieceType::None,
-        PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,
-        PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black,
-        PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,  PieceType::Black, PieceType::None,
-    };
+	PieceType m_pieces[NumberOfSquares];
 };
 
 }

@@ -18,8 +18,8 @@ class CheckersBoard
 {
 public:
     enum class SideType { White, Black };
-    enum class MoveError { None, IsOutOfBounds, IsOccupied, IsNotDiagonal, IsNotAdjacent,
-                           NoJumpPiece, TooFar, NoPieceToMove, WrongSide, IsBackwards, MustJump
+    enum class MoveError {	None, IsOutOfBounds, IsOccupied, IsNotDiagonal, IsNotAdjacent, NoJumpPiece, // 5
+							TooFar, NoPieceToMove, WrongSide, IsBackwards, MustJump
                          };
 
     const static int NumberOfSquares = 64;

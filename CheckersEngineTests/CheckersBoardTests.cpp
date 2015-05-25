@@ -243,6 +243,17 @@ TEST_F( EmptyBoardTest, test_king_moving_backwards )
 
 TEST_F( EmptyBoardTest, test_king_jump )
 {
+	Move backwardsJump{ Pos{ 2, 2 }, Pos{ 0, 0 } };
 
+	board.SetPiece(backwardsJump.from, Piece(PieceType::White, false)); // Plain piece
+	board.SetPiece(backwardsJump.GetJumpPos(), PieceType::Black);
+
+	EXPECT_EQ(board.GetMoveError(backwardsJump), CheckersBoard::MoveError::IsBackwards);
+
+	board.SetPiece(backwardsJump.from, Piece(PieceType::White, true)); // King
+	EXPECT_EQ(board.GetMoveError(backwardsJump), CheckersBoard::MoveError::None);
+
+	board.DoMove(backwardsJump);
+	EXPECT_EQ(board.GetPiece(backwardsJump.GetJumpPos()).pieceType, PieceType::None);
 }
 

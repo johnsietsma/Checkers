@@ -5,8 +5,9 @@
 
 using namespace checkers;
 
+using PieceType = checkers::Piece::PieceType;
 
-const CheckersBoard::PieceType CheckersBoard::DefaultPieceLayout[NumberOfSquares] = {
+const Piece::PieceType CheckersBoard::DefaultPieceLayout[NumberOfSquares] = {
     PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White,
     PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,
     PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White, PieceType::None,  PieceType::White,
@@ -20,7 +21,10 @@ const CheckersBoard::PieceType CheckersBoard::DefaultPieceLayout[NumberOfSquares
 CheckersBoard::CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideType startSide ) :
     m_currentSide( startSide )
 {
-    std::memcpy( m_pieces, pieceTypes, sizeof( m_pieces ) );
+    for( int i=0; i<NumberOfSquares; i++ )
+    {
+    	m_pieces[i].pieceType = pieceTypes[i];
+    }
 }
 
 
@@ -87,7 +91,7 @@ CheckersBoard::MoveError CheckersBoard::GetMoveError_DontForceJumps( const check
     else if ( dist == 4 ) {
         // We're jumping, check for an appropriate piece to jump
         Pos jumpPos = move.from + ( move.to - move.from ).Clamp1();
-        return IsOccupied( jumpPos, GetOpponentPieceType( pieceType ) ) ? MoveError::None : MoveError::NoJumpPiece;
+        return IsOccupied( jumpPos, Piece::GetOpponentPieceType( pieceType ) ) ? MoveError::None : MoveError::NoJumpPiece;
     }
 
     // We're moving some other distance, not allowed

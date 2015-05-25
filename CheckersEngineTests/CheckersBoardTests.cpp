@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 
 using namespace checkers;
-using PieceType = checkers::CheckersBoard::PieceType;
+using PieceType = checkers::Piece::PieceType;
 
 static const PieceType EmptyPieceLayout[CheckersBoard::NumberOfSquares] {};
 

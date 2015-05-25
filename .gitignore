@@ -1,1 +1,14 @@
-build/
+build/xcode/
+build/*/dep/
+
+Debug/
+Release/
+
+*.vcxproj.filters
+*.opensdf
+*.sdf
+
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestFile.cmake

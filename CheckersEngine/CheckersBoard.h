@@ -48,6 +48,7 @@ public:
     }
 
 	/// Sets a piece at a given location.
+	// This is only public for testing purposes. use DoMove() instead.
     void SetPiece( Pos pos, PieceType piece )
 	{
 		if ( IsOutOfBounds(pos) ) { assert(false && "Piece out of bounds"); return; }

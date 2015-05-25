@@ -13,6 +13,7 @@ ENDIF (APPLE)
 add_library(${LIBRARY_NAME}
   CheckersBoard.h
   CheckersBoard.cpp
+  Move.h
   Pos.h
 )
 

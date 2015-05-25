@@ -9,18 +9,18 @@ struct Pos
     int row;
     int column;
 
-    int IsAdjacent(Pos p) const
+    int IsAdjacent(const Pos& p) const
     {
         return GetDistance(p)==1;
     }
 
-    int GetDistance(Pos p) const
+    int GetDistance(const Pos& p) const
     {
         // Manhattan distance
         return std::abs( p.row - row ) + std::abs( p.column - column );
     }
 
-    bool IsDiagonal(Pos p) const
+    bool IsDiagonal(const Pos& p) const
     {
         return std::abs( p.row - row ) == std::abs( p.column - column );
     }
@@ -42,12 +42,12 @@ struct Pos
         return !(*this==rhs);
     }
 
-    Pos operator- ( Pos p ) const
+    Pos operator- ( const Pos& p ) const
     {
         return { row - p.row, column - p.column };
     }
 
-    Pos operator+ ( Pos p ) const
+    Pos operator+ ( const Pos& p ) const
     {
         return { row + p.row, column + p.column };
     }

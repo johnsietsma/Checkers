@@ -97,7 +97,8 @@ TEST_F( EmptyBoardTest, test_can_move_error_jump )
 
 TEST_F( DefaultBoardTest, test_can_move_error_jump_default_board )
 {
-    auto jumpMoves = board.GetJumpMoves();
+    std::vector<Move> jumpMoves;
+    board.GetJumpMoves( jumpMoves );
     EXPECT_EQ( 0, jumpMoves.size() );
 
     EXPECT_EQ( board.GetMoveError( { { 2, 1 }, { 3, 0 } } ), CheckersBoard::MoveError::None );
@@ -141,15 +142,24 @@ TEST_F( EmptyBoardTest, test_cant_move_backward )
 
 TEST_F( EmptyBoardTest, test_jumps_available )
 {
+    std::vector<Move> jumpMoves;
+
     // No jump moves available
-    EXPECT_EQ( 0, board.GetJumpMoves().size() );
+    board.GetJumpMoves( jumpMoves );
+    EXPECT_EQ( 0, jumpMoves.size() );
 
     board.SetPiece( { 0, 0 }, PieceType::White );
+    board.GetJumpMoves( jumpMoves );
+    EXPECT_EQ( 0, jumpMoves.size() );
+
     board.SetPiece( { 1, 1 }, PieceType::Black );
-    EXPECT_EQ( 1, board.GetJumpMoves().size() );
+    board.GetJumpMoves( jumpMoves );
+    EXPECT_EQ( 1, jumpMoves.size() );
+    jumpMoves.clear();
 
     board.SetPiece( { 2, 2 }, PieceType::Black );
-    EXPECT_EQ( 0, board.GetJumpMoves().size() );
+    board.GetJumpMoves( jumpMoves );
+    EXPECT_EQ( 0, jumpMoves.size() );
 }
 
 TEST_F( EmptyBoardTest, test_cant_move_if_jump_available )
@@ -173,7 +183,24 @@ TEST_F( EmptyBoardTest, test_cant_move_if_jump_available )
 
 TEST_F( EmptyBoardTest, test_multi_jump )
 {
+    Pos p1{ 0, 0 };
+    Pos jumpPos1{ 1, 1 };
+    Pos p2{ 2, 2 };
+    Pos jumpPos2{ 3, 3 };
+    Pos p3{ 4, 4 };
 
+    // Set up a double jump
+    board.SetPiece( p1, PieceType::White );
+    board.SetPiece( jumpPos1, PieceType::Black );
+    board.SetPiece( jumpPos2, PieceType::Black );
+
+    EXPECT_EQ( board.GetCurrentSide(), CheckersBoard::SideType::White );
+    board.DoMove( Move{ p1, p2 } ); // Wont swap sides
+
+    EXPECT_EQ( board.GetCurrentSide(), CheckersBoard::SideType::White );
+    board.DoMove( Move{ p2, p3 } ); // Will swap sides, no more jumps
+
+    EXPECT_EQ( board.GetCurrentSide(), CheckersBoard::SideType::Black );
 }
 
 TEST_F( EmptyBoardTest, test_make_a_king )

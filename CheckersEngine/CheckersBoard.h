@@ -42,7 +42,11 @@ public:
     void SetPiece( const Pos &pos, PieceType piece );
 
     /// Get all the jump moves that the current size can make.
-    std::vector<Move> GetJumpMoves() const;
+    // The available legal moves are added to the given vector.
+    void GetJumpMoves( std::vector<Move>& jumpMoves ) const;
+
+    /// Get all the jump moves that the current size can make from the given Pos.
+    void GetJumpMoves( const Pos& pos, std::vector<Move>& jumpMoves ) const;
 
     /// Returns whether the position is occupied. An out of bounds pos is considered occupied.
     bool IsOccupied( const Pos &pos ) const;

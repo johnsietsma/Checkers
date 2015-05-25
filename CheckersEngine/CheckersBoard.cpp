@@ -24,32 +24,36 @@ CheckersBoard::CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideT
 }
 
 
-std::vector<Move> CheckersBoard::GetJumpMoves() const
+void CheckersBoard::GetJumpMoves( std::vector<Move> &jumpMoves ) const
 {
-    static const Pos jumpDeltas[4] { Pos{ 2, 2 }, Pos{ -2, 2 }, Pos{ -2, -2 }, Pos{ 2, -2 } };
-    std::vector<Move> jumpMoves;
     for ( int row = 0; row < NumberOfRows; row++ ) {
         for ( int column = 0; column < NumberOfColumns; column++ ) {
-            for ( auto jumpDelta : jumpDeltas ) {
-                Pos startPos{ row, column };
-                Move jumpMove{ startPos, startPos + jumpDelta };
-                if ( GetMoveError_DontForceJumps( jumpMove ) == MoveError::None ) {
-                    jumpMoves.push_back( jumpMove );
-                }
-            }
+            Pos startPos{ row, column };
+            GetJumpMoves( startPos, jumpMoves );
         }
     }
-    return jumpMoves;
 }
 
+void CheckersBoard::GetJumpMoves( const Pos &startPos, std::vector<Move> &jumpMoves ) const
+{
+    static const Pos jumpDeltas[4] { Pos{ 2, 2 }, Pos{ -2, 2 }, Pos{ -2, -2 }, Pos{ 2, -2 } };
+
+    for ( auto jumpDelta : jumpDeltas ) {
+        Move jumpMove{ startPos, startPos + jumpDelta };
+        if ( GetMoveError_DontForceJumps( jumpMove ) == MoveError::None ) {
+            jumpMoves.push_back( jumpMove );
+        }
+    }
+}
 
 CheckersBoard::MoveError CheckersBoard::GetMoveError( const checkers::Move &move ) const
 {
     auto moveError = GetMoveError_DontForceJumps( move );
     if ( moveError == MoveError::None ) {
         // Check the available jump separately to the move errors to avoid recursion
-        auto jumpMoves = GetJumpMoves();
-        if ( jumpMoves.size() > 0 && std::find( std::begin( jumpMoves ), std::end( jumpMoves ), move ) == std::end( jumpMoves ) ) {
+        std::vector<Move> jumpMoves;
+        GetJumpMoves( jumpMoves );
+        if ( jumpMoves.size() > 0 && std::find( jumpMoves.begin(), jumpMoves.end(), move ) == jumpMoves.end() ) {
             return MoveError::MustJump;
         }
     }
@@ -94,8 +98,22 @@ void CheckersBoard::DoMove( const Move &move )
 {
     if ( !CanMove( move ) ) { throw std::out_of_range( "Move is not allowed" ); }
     PieceType piece = GetPiece( move.from );
+
     SetPiece( move.from, PieceType::None );
     SetPiece( move.to, piece );
-    m_currentSide = m_currentSide == SideType::White ? SideType::Black : SideType::Black;
+
+    // Only swap if we can't jump again
+    std::vector<Move> jumpMoves;
+    GetJumpMoves( jumpMoves );
+    if ( std::find_if( jumpMoves.begin(), jumpMoves.end(),
+    		[&move]( const Move & jumpMove )
+    		{
+    			return move.to == jumpMove.from; // A jump move is available from our to Pos.
+    		}
+    	) == jumpMoves.end()
+    )
+    {
+       	m_currentSide = m_currentSide == SideType::White ? SideType::Black : SideType::Black;
+    }
 }
 

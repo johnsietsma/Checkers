@@ -82,15 +82,13 @@ CheckersBoard::MoveError CheckersBoard::GetMoveError_DontForceJumps( const check
     if ( forwardDist > 0 && pieceType == PieceType::Black ) { return MoveError::IsBackwards; }
     if ( forwardDist < 0 && pieceType == PieceType::White ) { return MoveError::IsBackwards; }
 
-
-    int dist = move.from.GetDistance( move.to );
-    if ( dist == 2 ) {
+    if ( move.IsAdjacentMove() ) {
         // We're moving to an adjacent diagonal sqaure
         return MoveError::None;
     }
-    else if ( dist == 4 ) {
+    else if ( move.IsJumpMove() ) {
         // We're jumping, check for an appropriate piece to jump
-        Pos jumpPos = move.from + ( move.to - move.from ).Clamp1();
+		Pos jumpPos = move.GetJumpPos();
         return IsOccupied( jumpPos, Piece::GetOpponentPieceType( pieceType ) ) ? MoveError::None : MoveError::NoJumpPiece;
     }
 
@@ -110,6 +108,12 @@ void CheckersBoard::DoMove( const Move &move )
     SetPiece( move.from, PieceType::None );
     SetPiece( move.to, piece );
 
+	if (move.IsJumpMove())
+	{
+		// Remove the captured piece
+		auto jumpPos = move.GetJumpPos();
+		SetPiece(jumpPos, PieceType::None);
+	}
 
     // Only swap if we can't jump again
     std::vector<Move> jumpMoves;

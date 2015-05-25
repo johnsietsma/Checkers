@@ -63,6 +63,20 @@ TEST_F( DefaultBoardTest, test_move )
     EXPECT_TRUE( board.IsOccupied( move.to ) );
 }
 
+TEST_F(EmptyBoardTest, test_jump_removes_piece)
+{
+	Pos startPos{ 0, 0 };
+	Pos p1{ 1, 1 };
+	Pos endPos{ 2, 2 };
+
+	board.SetPiece(startPos, PieceType::White);
+	board.SetPiece(p1, PieceType::Black);
+
+	EXPECT_EQ(board.GetPiece(p1).pieceType, PieceType::Black);
+	board.DoMove(Move{ startPos, endPos });
+	EXPECT_EQ(board.GetPiece(p1).pieceType, PieceType::None); // Piece is taken
+}
+
 TEST_F( DefaultBoardTest, test_can_move_one_diagonal )
 {
     EXPECT_EQ( board.GetMoveError( { { 2, 1 }, { 3, 0 } } ), CheckersBoard::MoveError::None );

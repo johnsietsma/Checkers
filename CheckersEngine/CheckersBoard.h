@@ -3,6 +3,7 @@
 #include "Pos.h"
 
 #include <assert.h>
+#include <vector>
 
 namespace checkers {
 
@@ -13,6 +14,16 @@ struct Move
 {
     Pos from;
     Pos to;
+
+	bool operator== (const Move& rhs) const
+	{
+		return from == rhs.from && to == rhs.to;
+	}
+
+	bool operator!= (const Move& rhs) const
+	{
+		return !(*this == rhs);
+	}
 };
 
 /**
@@ -26,7 +37,7 @@ public:
     enum class PieceType { None, White, Black };
     enum class SideType { White, Black };
     enum class MoveError { None, IsOutOfBounds, IsOccupied, IsNotDiagonal, IsNotAdjacent,
-        NoJumpPiece, TooFar, NoPieceToMove, WrongSide, IsBackwards };
+        NoJumpPiece, TooFar, NoPieceToMove, WrongSide, IsBackwards, MustJump };
 
     const static int NumberOfSquares = 64;
     const static int NumberOfColumns = 8;
@@ -55,11 +66,20 @@ public:
         m_pieces[PosToIndex(pos)] = piece;
     }
 
+	/// Get all the jump moves that the current size can make.
+	std::vector<Move> GetJumpMoves() const;
+
 	/// Returns whether the position is occupied. An out of bounds pos is considered occupied.
 	bool IsOccupied(Pos pos) const
 	{
-        return IsOutOfBounds(pos) || PieceType::None != m_pieces[PosToIndex(pos)];
+		return IsOccupied(pos, PieceType::Black) || IsOccupied(pos, PieceType::White);
     }
+
+	// Returns whether a square is occupied by a particular PieceType.
+	bool IsOccupied(Pos pos, PieceType pieceType) const
+	{
+		return IsOutOfBounds(pos) || pieceType == m_pieces[PosToIndex(pos)];
+	}
 
 	/// Returns whether a position is out of bounds.
     bool IsOutOfBounds( Pos pos ) const
@@ -76,7 +96,7 @@ public:
         return GetMoveError(move)==MoveError::None;
     }
 
-	/// Verifys a move and returns the error, can be MoveError::None.
+	/// Verifies a move and returns the error, can be MoveError::None.
 	MoveError GetMoveError(const Move& move) const;
 
 	/// Performs the move
@@ -84,7 +104,13 @@ public:
 
 private:
 	/// Convert a Pos into an index into the board array.
-    int PosToIndex( Pos pos ) const { return (pos.row*NumberOfColumns) + pos.column; }
+    static int PosToIndex( Pos pos ) { return (pos.row*NumberOfColumns) + pos.column; }
+
+	/// Return the opponents piece type.
+	static PieceType GetOpponentPieceType(PieceType pieceType)  { return pieceType == PieceType::White ? PieceType::Black : PieceType::White; }
+
+	/// Checks for all move errors, but doesn't return an error if there is a jump available.
+	MoveError GetMoveError_DontForceJumps(const Move& move) const;
 
 	/// The current side whose turn it is to move.
     SideType m_currentSide;

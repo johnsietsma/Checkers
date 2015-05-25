@@ -50,7 +50,7 @@ TEST_F(DefaultBoardTest, test_get_piece)
 
 TEST_F(DefaultBoardTest, test_move)
 {
-    Move move = {{1,2}, {3,0}};
+    Move move = {{2,1}, {3,0}};
 
     EXPECT_TRUE( board.IsOccupied( move.from ) );
     EXPECT_FALSE( board.IsOccupied( move.to ) );
@@ -63,8 +63,8 @@ TEST_F(DefaultBoardTest, test_move)
 
 TEST_F(DefaultBoardTest, test_can_move_one_diagonal)
 {
-    EXPECT_EQ( board.GetMoveError( { {2,1}, {3,0} } ), CheckersBoard::MoveError::None );
-    EXPECT_EQ( board.GetMoveError( { {1,2}, {4,0} } ), CheckersBoard::MoveError::IsNotDiagonal );
+	EXPECT_EQ(board.GetMoveError({ { 2, 1 }, { 3, 0 } }), CheckersBoard::MoveError::None);
+	EXPECT_EQ(board.GetMoveError({ { 1, 2 }, { 4, 0 } }), CheckersBoard::MoveError::IsNotDiagonal);
 }
 
 TEST_F(DefaultBoardTest, test_cant_move_occupied)
@@ -74,24 +74,17 @@ TEST_F(DefaultBoardTest, test_cant_move_occupied)
 
 TEST_F(DefaultBoardTest, test_cant_move_out_of_bounds)
 {
-    CheckersBoard board;
-
     EXPECT_FALSE( board.CanMove( {{0,1}, {-1,0}} ) );
 }
 
 TEST_F(EmptyBoardTest, test_cant_move_no_piece)
 {
-	PieceType initialPieces[64] {};
-    CheckersBoard board(initialPieces, CheckersBoard::SideType::White);
     EXPECT_EQ( board.GetMoveError( { {0,0}, {1,1} } ), CheckersBoard::MoveError::NoPieceToMove );
 }
 
 
-TEST_F(EmptyBoardTest, test_can_move_jump)
+TEST_F(EmptyBoardTest, test_can_move_error_jump)
 {
-	PieceType initialPieces[64] {};
-    CheckersBoard board(initialPieces, CheckersBoard::SideType::White);
-
     board.SetPiece( {0,0}, PieceType::White );
     board.SetPiece( {1,1}, PieceType::Black );
     EXPECT_EQ( board.GetMoveError( { {0,0}, {2,2} } ), CheckersBoard::MoveError::None );
@@ -100,12 +93,16 @@ TEST_F(EmptyBoardTest, test_can_move_jump)
     EXPECT_EQ( board.GetMoveError( { {0,0}, {2,2} } ), CheckersBoard::MoveError::NoJumpPiece );
 }
 
+TEST_F(DefaultBoardTest, test_can_move_error_jump_default_board)
+{
+	auto jumpMoves = board.GetJumpMoves();
+	EXPECT_EQ(0, jumpMoves.size());
+
+	EXPECT_EQ(board.GetMoveError({ { 2, 1 }, { 3, 0 } }), CheckersBoard::MoveError::None);
+}
+
 TEST_F(EmptyBoardTest, test_cant_move_wrong_side)
 {
-	// Setup empty board
-	PieceType initialPieces[64] {};
-	CheckersBoard board;
-
 	Pos p1{ 0, 0 };
 	Pos p2{ 1, 1 };
 
@@ -133,9 +130,62 @@ TEST_F(EmptyBoardTest, test_cant_move_backward)
 	Pos startPos{ 1, 1 };
 	board.SetPiece(startPos, PieceType::White);
 
-	Move moveForward{ startPos, (startPos + Pos{ 1, 1 }) };
+	Move moveForward{ startPos, startPos + Pos{ 1, 1 } };
 	EXPECT_EQ(board.GetMoveError(moveForward), CheckersBoard::MoveError::None);
 	
-	Move moveBackward{ startPos, (startPos - Pos{ 1, 1 }) };
+	Move moveBackward{ startPos, startPos - Pos{ 1, 1 } };
 	EXPECT_EQ(board.GetMoveError(moveBackward), CheckersBoard::MoveError::IsBackwards);
 }
+
+TEST_F(EmptyBoardTest, test_jumps_available)
+{
+	// No jump moves available
+	EXPECT_EQ(0, board.GetJumpMoves().size());
+
+	board.SetPiece({ 0, 0 }, PieceType::White);
+	board.SetPiece({ 1, 1 }, PieceType::Black);
+	//EXPECT_EQ(1, board.GetJumpMoves().size());
+
+	board.SetPiece({ 2, 2 }, PieceType::Black);
+	//EXPECT_EQ(0, board.GetJumpMoves().size());
+}
+
+TEST_F(EmptyBoardTest, test_cant_move_if_jump_available)
+{
+	Pos startPos{ 0, 0 };
+	board.SetPiece(startPos, PieceType::White);
+
+	Pos jumpPos{ 1, 1 };
+	board.SetPiece(jumpPos, PieceType::Black);
+
+	// Jump move is OK
+	Move jumpMove{ startPos, startPos + Pos{ 2, 2 } };
+	EXPECT_EQ(board.GetMoveError(jumpMove), CheckersBoard::MoveError::None);
+
+	Pos otherPos{ 4, 4 };
+	board.SetPiece(otherPos, PieceType::White);
+
+	Move otherMove{ { 4, 4 }, { 5, 5 } };
+	EXPECT_EQ(board.GetMoveError(otherMove), CheckersBoard::MoveError::MustJump);
+}
+
+TEST_F(EmptyBoardTest, test_multi_jump)
+{
+
+}
+
+TEST_F(EmptyBoardTest, test_make_a_king)
+{
+
+}
+
+TEST_F(EmptyBoardTest, test_king_moving_backwards)
+{
+
+}
+
+TEST_F(EmptyBoardTest, test_king_jump)
+{
+
+}
+

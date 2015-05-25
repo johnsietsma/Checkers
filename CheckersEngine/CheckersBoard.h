@@ -16,8 +16,9 @@ struct Move
 };
 
 /**
- * Represents a CheckersBoard, including all the sqaures and the pieces on those squares.
+ * Represents a logical CheckersBoard, including all the sqaures and the pieces on those squares.
  * Defines operations for moving, get and setting pieces on square.
+ * Checks move errors and performs moves.
  */
 class CheckersBoard
 {
@@ -31,76 +32,68 @@ public:
     const static int NumberOfColumns = 8;
     const static int NumberOfRows = 8;
 
-	// The default starting positions of all the pieces.
-	static const PieceType DefaultPieceLayout[NumberOfSquares];
-
-	/**
-	 * Creates a new board with the default piece layout.
-	*/
+	/// Creates a new board with the default piece layout.
 	CheckersBoard() : CheckersBoard(DefaultPieceLayout, SideType::White) {}
 
+	/// Create a board with a custom layout and starting side.
     CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideType currentSide );
 
-    PieceType GetPiece( Pos pos ) {
+	SideType GetCurrentSide() const { return m_currentSide;  }
+
+	/// Get the piece at the given position. Returns PieceType::None if ot of bounds.
+    PieceType GetPiece( Pos pos ) const
+	{
         if( IsOutOfBounds(pos) ) return PieceType::None;
         return m_pieces[PosToIndex(pos)];
     }
 
-    void SetPiece( Pos pos, PieceType piece ) {
-        assert( !IsOutOfBounds(pos) );
+	/// Sets a piece at a given location.
+    void SetPiece( Pos pos, PieceType piece )
+	{
+		if ( IsOutOfBounds(pos) ) { assert(false && "Piece out of bounds"); return; }
         m_pieces[PosToIndex(pos)] = piece;
     }
 
-    bool IsOccupied( Pos pos ) {
-        // An out of bounds pos is considered occupied
+	/// Returns whether the position is occupied. An out of bounds pos is considered occupied.
+	bool IsOccupied(Pos pos) const
+	{
         return IsOutOfBounds(pos) || PieceType::None != m_pieces[PosToIndex(pos)];
     }
 
-    bool IsOutOfBounds( Pos pos ) {
+	/// Returns whether a position is out of bounds.
+    bool IsOutOfBounds( Pos pos ) const
+	{
         return  pos.row < 0 ||
                 pos.row >= NumberOfRows ||
                 pos.column < 0 ||
                 pos.column >= NumberOfColumns;
     }
 
-    bool CanMove( Move move ) {
+	/// Returns whether a move can be made.
+    bool CanMove( Move move ) const
+	{
         return GetMoveError(move)==MoveError::None;
     }
 
-    MoveError GetMoveError( Move move )
-    {
-        if( !IsOccupied(move.from) ) return MoveError::NoPieceToMove;
-        if( IsOccupied(move.to) ) return MoveError::IsOccupied;
-        if( IsOutOfBounds(move.to) ) return MoveError::IsOutOfBounds;
-        if( !move.from.IsDiagonal(move.to) ) return MoveError::IsNotDiagonal;
+	/// Verifys a move and returns the error, can be MoveError::None.
+	MoveError GetMoveError(const Move& move) const;
 
-        int dist = move.from.GetDistance(move.to);
-        if( dist==2 )
-        {
-            return MoveError::None;
-        }
-        else if( dist==4 )
-        {
-            Pos jumpPos = move.from + (move.to-move.from).Clamp1();
-            return IsOccupied(jumpPos) ? MoveError::None : MoveError::NoJumpPiece;
-        }
-        return MoveError::TooFar;
-    }
-
-    void Move( Move move ) {
-        if( !CanMove(move) ) { assert(false); return; }
-        PieceType piece = GetPiece( move.from );
-        SetPiece( move.from, PieceType::None );
-        SetPiece( move.to, piece );
-        m_currentSide = m_currentSide==SideType::White ? SideType::Black : SideType::Black;
-    }
+	/// Performs the move
+	void DoMove(Move move);
 
 private:
-    int PosToIndex( Pos pos ) { return (pos.row*NumberOfColumns) + pos.column; }
+	/// Convert a Pos into an index into the board array.
+    int PosToIndex( Pos pos ) const { return (pos.row*NumberOfColumns) + pos.column; }
 
+	/// The current side whose turn it is to move.
     SideType m_currentSide;
 
+	/// The board array.
 	PieceType m_pieces[NumberOfSquares];
+
+	// The default starting positions of all the pieces.
+	static const PieceType DefaultPieceLayout[NumberOfSquares];
+
 };
 
 }

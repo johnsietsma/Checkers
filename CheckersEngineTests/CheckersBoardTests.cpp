@@ -45,7 +45,7 @@ TEST(checkersboard_test, test_move)
     EXPECT_TRUE( board.IsOccupied( move.from ) );
     EXPECT_FALSE( board.IsOccupied( move.to ) );
 
-	board.Move(move);
+	board.DoMove(move);
 
 	EXPECT_FALSE( board.IsOccupied( move.from ) );
     EXPECT_TRUE( board.IsOccupied( move.to ) );
@@ -96,19 +96,29 @@ TEST(checkersboard_test, test_can_move_jump)
 
 TEST(checkersboard_test, test_cant_move_wrong_side)
 {
+	// Setup empty board
 	PieceType initialPieces[64] {};
 	CheckersBoard board;
 
-	board.SetPiece({ 0, 0 }, PieceType::White);
-	board.SetPiece({ 0, 1 }, PieceType::None);
-	Move move{ { 0, 0 }, { 0, 1 } };
+	Pos p1{ 0, 0 };
+	Pos p2{ 1, 1 };
 
-	board.Move(move); // Changes the side
+	board.SetPiece(p1, PieceType::White);
+	board.SetPiece(p2, PieceType::None);
+	Move move{ p1, p2 };
+
+	// White's turn
+	EXPECT_EQ(board.GetCurrentSide(), CheckersBoard::SideType::White);
 	EXPECT_EQ(board.GetMoveError(move), CheckersBoard::MoveError::None);
+	board.DoMove(move); // Changes the side
 
-	board.SetPiece({ 0, 0 }, PieceType::White);
-	board.SetPiece({ 0, 1 }, PieceType::None);
+	// Black's turn
+	EXPECT_EQ(board.GetCurrentSide(), CheckersBoard::SideType::Black);
 
+	board.SetPiece(p1, PieceType::White);
+	board.SetPiece(p2, PieceType::None);
+
+	// Can't move the white piece
     EXPECT_EQ( board.GetMoveError( move ), CheckersBoard::MoveError::WrongSide );
 
 }

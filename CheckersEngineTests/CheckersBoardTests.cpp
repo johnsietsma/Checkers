@@ -130,5 +130,12 @@ TEST_F(EmptyBoardTest, test_cant_move_wrong_side)
 
 TEST_F(EmptyBoardTest, test_cant_move_backward)
 {
+	Pos startPos{ 1, 1 };
+	board.SetPiece(startPos, PieceType::White);
 
+	Move moveForward{ startPos, (startPos + Pos{ 1, 1 }) };
+	EXPECT_EQ(board.GetMoveError(moveForward), CheckersBoard::MoveError::None);
+	
+	Move moveBackward{ startPos, (startPos - Pos{ 1, 1 }) };
+	EXPECT_EQ(board.GetMoveError(moveBackward), CheckersBoard::MoveError::IsBackwards);
 }

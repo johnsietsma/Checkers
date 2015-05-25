@@ -26,7 +26,7 @@ public:
     enum class PieceType { None, White, Black };
     enum class SideType { White, Black };
     enum class MoveError { None, IsOutOfBounds, IsOccupied, IsNotDiagonal, IsNotAdjacent,
-        NoJumpPiece, TooFar, NoPieceToMove, WrongSide };
+        NoJumpPiece, TooFar, NoPieceToMove, WrongSide, IsBackwards };
 
     const static int NumberOfSquares = 64;
     const static int NumberOfColumns = 8;

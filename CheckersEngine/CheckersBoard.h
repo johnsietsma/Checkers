@@ -39,6 +39,11 @@ public:
 
     SideType GetCurrentSide() const { return m_currentSide;  }
 
+	static WinType GetWinTypeFromSideType(SideType side)
+	{
+		return side == SideType::White ? WinType::White : WinType::Black;
+	}
+
     /// Get the piece at the given position. Returns PieceType::None if ot of bounds.
     Piece GetPiece( const Pos &pos ) const;
 
@@ -88,11 +93,6 @@ private:
 	SideType GetCurrentOpponentSide() const
 	{
 		return GetCurrentSide() == SideType::White ? SideType::Black : SideType::White;
-	}
-
-	static WinType GetWinTypeFromSideType(SideType side)
-	{
-		return side == SideType::White ? WinType::White : WinType::Black;
 	}
 
 	/// Get all the legal moves from startPos. Moves are made usingthe moveDeltas.

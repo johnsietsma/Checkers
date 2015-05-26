@@ -278,7 +278,7 @@ TEST_F(DefaultBoardTest, test_get_moves_default)
 	EXPECT_FALSE(moves.empty());
 }
 
-TEST_F(EmptyBoardTest, test_get_moves_default)
+TEST_F(EmptyBoardTest, test_get_moves_one)
 {
 	Pos p1{ 0, 0 };
 	Pos p2{ 1, 1 };
@@ -288,5 +288,37 @@ TEST_F(EmptyBoardTest, test_get_moves_default)
 	board.GetMoves(moves);
 
 	EXPECT_EQ(1, moves.size());
-	EXPECT_EQ(p2, moves[0].to);
+	EXPECT_TRUE(board.CanMove(moves[0]));
+}
+
+TEST_F(EmptyBoardTest, test_get_moves_two)
+{
+	CheckersBoard board(EmptyPieceLayout, CheckersBoard::SideType::White);
+
+	Pos p1{ 0, 0 };
+	Pos p2{ 0, 2 };
+	Pos p3{ 1, 1 }; // p1 and p2 can jump p2
+	Pos p4{ 4, 0 }; // Can't move, jumps happen first
+
+	board.SetPiece(p1, Piece::PieceType::White);
+	board.SetPiece(p2, Piece::PieceType::White);
+	board.SetPiece(p3, Piece::PieceType::Black);
+	board.SetPiece(p4, Piece::PieceType::White);
+
+	std::vector<Move> moves;
+	board.GetMoves(moves);
+
+	EXPECT_EQ(2, moves.size());
+	EXPECT_EQ(board.GetMoveError(moves[0]), CheckersBoard::MoveError::None);
+	EXPECT_EQ(board.GetMoveError(moves[1]), CheckersBoard::MoveError::None);
+}
+
+TEST_F(DefaultBoardTest, test_copy_constructor)
+{
+	board.SetPiece({ 0, 0 }, PieceType::White);
+	CheckersBoard board1(board);
+	board1.DoMove(Move{ { 0, 0 }, { 1, 1 } });
+
+	EXPECT_NE(board.GetPiece({ 1, 1 }).pieceType, PieceType::White);
+	EXPECT_EQ(board1.GetPiece({ 1, 1 }).pieceType, PieceType::White);
 }

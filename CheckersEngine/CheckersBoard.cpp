@@ -35,11 +35,21 @@ CheckersBoard::CheckersBoard(const CheckersBoard& board)
 
 void CheckersBoard::GetMoves(std::vector<Move> &moves) const
 {
+	int currentMoveCount = moves.size();
 	for (int row = 0; row < NumberOfRows; row++) {
 		for (int column = 0; column < NumberOfColumns; column++) {
 			Pos startPos{ row, column };
-			GetMoves(startPos, moves);
 			GetJumpMoves(startPos, moves);
+		}
+	}
+
+	// If there are jump moves, we have to do them first.
+	if (currentMoveCount != moves.size()) return;
+
+	for (int row = 0; row < NumberOfRows; row++) {
+		for (int column = 0; column < NumberOfColumns; column++) {
+			Pos startPos{ row, column };
+			GetMoves(startPos, moves); 
 		}
 	}
 }

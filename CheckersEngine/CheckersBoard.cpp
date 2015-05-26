@@ -27,6 +27,12 @@ CheckersBoard::CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideT
     }
 }
 
+CheckersBoard::CheckersBoard(const CheckersBoard& board)
+{
+	memcpy(const_cast<Piece*>(board.m_pieces), m_pieces, sizeof(m_pieces));
+	m_currentSide = board.m_currentSide;
+}
+
 void CheckersBoard::GetMoves(std::vector<Move> &moves) const
 {
 	for (int row = 0; row < NumberOfRows; row++) {

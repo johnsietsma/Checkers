@@ -32,6 +32,9 @@ public:
     /// Create a board with a custom layout and starting side.
     CheckersBoard( const Piece::PieceType pieceTypes[NumberOfSquares], SideType currentSide );
 
+	// Copy constructor
+	CheckersBoard(const CheckersBoard& board);
+
     SideType GetCurrentSide() const { return m_currentSide;  }
 
     /// Get the piece at the given position. Returns PieceType::None if ot of bounds.

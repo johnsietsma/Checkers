@@ -40,11 +40,16 @@ public:
     /// Sets a piece at a given location.
     void SetPiece( const Pos &pos, const Piece& piece );
 
+	/// Get all the legal moves that the current side can make.
+	void GetMoves(std::vector<Move> &moves) const;
+
+	/// Get all the legal moves that the current side can make from the given Pos.
+	void GetMoves(const Pos &pos, std::vector<Move> &moves) const;
+
     /// Get all the jump moves that the current size can make.
-    // The available legal moves are added to the given vector.
     void GetJumpMoves( std::vector<Move> &jumpMoves ) const;
 
-    /// Get all the jump moves that the current size can make from the given Pos.
+    /// Get all the jump moves that the current side can make from the given Pos.
     void GetJumpMoves( const Pos &pos, std::vector<Move> &jumpMoves ) const;
 
     /// Returns whether the position is occupied. An out of bounds pos is considered occupied.
@@ -68,6 +73,10 @@ public:
 private:
     /// Convert a Pos into an index into the board array.
     static int PosToIndex( const Pos &pos ) { return ( pos.row * NumberOfColumns ) + pos.column; }
+
+	/// Get all the legal moves from startPos. Moves are made usingthe moveDeltas.
+	// Legal moves are added to the moves vector.
+	void GetMoves(const Pos &startPos, const Pos moveDeltas[4], std::vector<Move> &moves) const;
 
     /// Checks for all move errors, but doesn't return an error if there is a jump available.
     MoveError GetMoveError_DontForceJumps( const Move &move ) const;

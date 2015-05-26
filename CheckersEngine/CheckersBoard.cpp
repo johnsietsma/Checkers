@@ -27,6 +27,22 @@ CheckersBoard::CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideT
     }
 }
 
+void CheckersBoard::GetMoves(std::vector<Move> &moves) const
+{
+	for (int row = 0; row < NumberOfRows; row++) {
+		for (int column = 0; column < NumberOfColumns; column++) {
+			Pos startPos{ row, column };
+			GetMoves(startPos, moves);
+			GetJumpMoves(startPos, moves);
+		}
+	}
+}
+
+void CheckersBoard::GetMoves(const Pos &pos, std::vector<Move> &moves) const
+{
+	static const Pos moveDeltas[4] { Pos{ 1, 2 }, Pos{ -2, 2 }, Pos{ -2, -2 }, Pos{ 2, -2 } };
+	GetMoves(pos, moveDeltas, moves);
+}
 
 void CheckersBoard::GetJumpMoves( std::vector<Move> &jumpMoves ) const
 {
@@ -41,13 +57,18 @@ void CheckersBoard::GetJumpMoves( std::vector<Move> &jumpMoves ) const
 void CheckersBoard::GetJumpMoves( const Pos &startPos, std::vector<Move> &jumpMoves ) const
 {
     static const Pos jumpDeltas[4] { Pos{ 2, 2 }, Pos{ -2, 2 }, Pos{ -2, -2 }, Pos{ 2, -2 } };
+	GetMoves(startPos, jumpDeltas, jumpMoves);
+}
 
-    for ( auto jumpDelta : jumpDeltas ) {
-        Move jumpMove{ startPos, startPos + jumpDelta };
-        if ( GetMoveError_DontForceJumps( jumpMove ) == MoveError::None ) {
-            jumpMoves.push_back( jumpMove );
-        }
-    }
+void CheckersBoard::GetMoves(const Pos &startPos, const Pos moveDeltas[4], std::vector<Move> &moves) const
+{
+	for (int i = 0; i < 4; i++) {
+		auto moveDelta = moveDeltas[i];
+		Move move{ startPos, startPos + moveDelta };
+		if (GetMoveError_DontForceJumps(move) == MoveError::None) {
+			moves.push_back(move);
+		}
+	}
 }
 
 CheckersBoard::MoveError CheckersBoard::GetMoveError( const checkers::Move &move ) const

@@ -137,34 +137,31 @@ CheckersBoard::MoveError CheckersBoard::GetMoveError_DontForceJumps( const check
 void CheckersBoard::DoMove( const Move &move )
 {
     if ( !CanMove( move ) ) { throw std::out_of_range( "Move is not allowed" ); }
+
     Piece piece = GetPiece( move.from );
 
+	// Check for king making
     if( IsOnLastRow(piece.pieceType, move.to) ) {
         piece.isKing = true;
     }
 
-    SetPiece( move.from, PieceType::None );
+	// Do the actual move
+    RemovePiece( move.from );
     SetPiece( move.to, piece );
 
+	// Check for jump
 	if (move.IsJumpMove())
 	{
 		// Remove the captured piece
 		auto jumpPos = move.GetJumpPos();
-		SetPiece(jumpPos, PieceType::None);
+		RemovePiece(jumpPos);
 	}
 
-    // Only swap if we can't jump again
+    // Only swap sides if we can't jump again from our new Pos
     std::vector<Move> jumpMoves;
-    GetJumpMoves( jumpMoves );
-    if ( std::find_if( jumpMoves.begin(), jumpMoves.end(),
-            [&move]( const Move & jumpMove )
-            {
-                return move.to == jumpMove.from; // A jump move is available from our to Pos.
-            }
-        ) == jumpMoves.end()
-    )
+    GetJumpMoves( move.to, jumpMoves );
+	if ( jumpMoves.empty() )
     {
-        m_currentSide = m_currentSide == SideType::White ? SideType::Black : SideType::Black;
+		m_currentSide = GetCurrentOpponentSide();
     }
 }
-

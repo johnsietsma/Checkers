@@ -281,7 +281,6 @@ TEST_F(DefaultBoardTest, test_get_moves_default)
 TEST_F(EmptyBoardTest, test_get_moves_one)
 {
 	Pos p1{ 0, 0 };
-	Pos p2{ 1, 1 };
 	board.SetPiece(p1, PieceType::White);
 
 	std::vector<Move> moves;

@@ -105,7 +105,7 @@ TEST_F( EmptyBoardTest, test_can_move_error_jump )
     board.SetPiece( {1, 1}, PieceType::Black );
     EXPECT_EQ( board.GetMoveError( { {0, 0}, {2, 2} } ), CheckersBoard::MoveError::None );
 
-    board.SetPiece( {1, 1}, PieceType::None );
+    board.RemovePiece( {1, 1} );
     EXPECT_EQ( board.GetMoveError( { {0, 0}, {2, 2} } ), CheckersBoard::MoveError::NoJumpPiece );
 }
 
@@ -124,7 +124,6 @@ TEST_F( EmptyBoardTest, test_cant_move_wrong_side )
     Pos p2{ 1, 1 };
 
     board.SetPiece( p1, PieceType::White );
-    board.SetPiece( p2, PieceType::None );
     Move move{ p1, p2 };
 
     // White's turn
@@ -136,7 +135,7 @@ TEST_F( EmptyBoardTest, test_cant_move_wrong_side )
     EXPECT_EQ( board.GetCurrentSide(), CheckersBoard::SideType::Black );
 
     board.SetPiece( p1, PieceType::White );
-    board.SetPiece( p2, PieceType::None );
+    board.RemovePiece( p2 );
 
     // Can't move the white piece
     EXPECT_EQ( board.GetMoveError( move ), CheckersBoard::MoveError::WrongSide );
@@ -257,3 +256,16 @@ TEST_F( EmptyBoardTest, test_king_jump )
 	EXPECT_EQ(board.GetPiece(backwardsJump.GetJumpPos()).pieceType, PieceType::None);
 }
 
+TEST_F(EmptyBoardTest, test_win)
+{
+	EXPECT_TRUE(board.IsFinished());
+
+	board.SetPiece(Pos{ 0, 0 }, PieceType::Black);
+	board.SetPiece(Pos{ 1, 1 }, PieceType::White);
+
+	EXPECT_FALSE(board.IsFinished());
+	board.RemovePiece(Pos{ 1, 1 });
+
+	EXPECT_TRUE(board.IsFinished());
+	EXPECT_EQ(board.GetWinner(), CheckersBoard::SideType::Black);
+}

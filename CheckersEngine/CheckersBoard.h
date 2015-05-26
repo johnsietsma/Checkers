@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <tuple>
 #include <vector>
 
 #include "Move.h"
@@ -43,6 +44,8 @@ public:
     /// Sets a piece at a given location.
     void SetPiece( const Pos &pos, const Piece& piece );
 
+	void RemovePiece( const Pos &pos );
+
 	/// Get all the legal moves that the current side can make.
 	void GetMoves(std::vector<Move> &moves) const;
 
@@ -73,6 +76,10 @@ public:
     /// Performs the move
     void DoMove( const Move &move );
 
+	bool IsFinished() const;
+
+	SideType GetWinner() const;
+
 private:
     /// Convert a Pos into an index into the board array.
     static int PosToIndex( const Pos &pos ) { return ( pos.row * NumberOfColumns ) + pos.column; }
@@ -80,6 +87,9 @@ private:
 	/// Get all the legal moves from startPos. Moves are made usingthe moveDeltas.
 	// Legal moves are added to the moves vector.
 	void GetMoves(const Pos &startPos, const Pos moveDeltas[4], std::vector<Move> &moves) const;
+
+	// Returns a pair of bools that represent whether a side has pieces on the board. In White, Black order.
+	std::tuple<bool, bool> GetSideHasPieces() const;
 
     /// Checks for all move errors, but doesn't return an error if there is a jump available.
     MoveError GetMoveError_DontForceJumps( const Move &move ) const;
@@ -108,6 +118,11 @@ inline void CheckersBoard::SetPiece( const Pos &pos, const Piece& piece )
 {
     if ( IsOutOfBounds( pos ) ) { assert( false && "Piece out of bounds" ); return; }
     m_pieces[PosToIndex( pos )] = piece;
+}
+
+inline void CheckersBoard::RemovePiece(const Pos &pos)
+{
+	m_pieces[PosToIndex(pos)] = Piece(Piece::PieceType::None,false);
 }
 
 inline bool CheckersBoard::IsOccupied( const Pos &pos ) const
@@ -144,5 +159,35 @@ inline bool CheckersBoard::IsOnLastRow( const Piece::PieceType &pieceType, const
 
     return false;
 }
+
+inline bool CheckersBoard::IsFinished() const
+{
+	auto sideHasPieces = GetSideHasPieces();
+	return !std::get<0>(sideHasPieces) || !std::get<1>(sideHasPieces);
+}
+
+inline CheckersBoard::SideType CheckersBoard::GetWinner() const
+{
+	auto sideHasPieces = GetSideHasPieces();
+	if (std::get<0>(sideHasPieces) && !std::get<1>(sideHasPieces)) { return SideType::White; }
+	if (!std::get<0>(sideHasPieces) && std::get<1>(sideHasPieces)) { return SideType::Black; }
+	assert(false && "No winner");
+	return SideType::White;
+}
+
+inline std::tuple<bool, bool> CheckersBoard::GetSideHasPieces() const
+{
+	bool hasWhite = false;
+	bool hasBlack = false;
+
+	for (auto piece : m_pieces)
+	{
+		if (piece.pieceType == Piece::PieceType::Black) { hasBlack = true; }
+		if (piece.pieceType == Piece::PieceType::White) { hasWhite = true; }
+	}
+
+	return std::tuple<bool,bool>{ hasWhite, hasBlack };
+}
+
 
 }

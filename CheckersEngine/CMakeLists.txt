@@ -11,8 +11,11 @@ ENDIF (APPLE)
 
 
 add_library(${LIBRARY_NAME}
+  AIPlayer.h
+  AIPlayer.cpp
   CheckersBoard.h
   CheckersBoard.cpp
+  CheckersBoardNode.h
   Move.h
   Piece.h
   Pos.h

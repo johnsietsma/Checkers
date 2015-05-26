@@ -37,6 +37,7 @@ TEST_F( DefaultBoardTest, test_is_occupied )
     EXPECT_TRUE( board.IsOccupied( {0, CheckersBoard::NumberOfColumns} ) );
 }
 
+
 TEST_F( DefaultBoardTest, test_is_out_of_bounds )
 {
     EXPECT_TRUE( board.IsOutOfBounds( {0, -1} ) );
@@ -266,6 +267,26 @@ TEST_F(EmptyBoardTest, test_win)
 	EXPECT_FALSE(board.IsFinished());
 	board.RemovePiece(Pos{ 1, 1 });
 
-	EXPECT_TRUE(board.IsFinished());
-	EXPECT_EQ(board.GetWinner(), CheckersBoard::SideType::Black);
+	EXPECT_TRUE(board.IsFinished()); // No white pieces, Black is the winner.
+	EXPECT_EQ(board.GetWinner(), CheckersBoard::WinType::Black);
+}
+
+TEST_F(DefaultBoardTest, test_get_moves_default)
+{
+	std::vector<Move> moves;
+	board.GetMoves(moves);
+	EXPECT_FALSE(moves.empty());
+}
+
+TEST_F(EmptyBoardTest, test_get_moves_default)
+{
+	Pos p1{ 0, 0 };
+	Pos p2{ 1, 1 };
+	board.SetPiece(p1, PieceType::White);
+
+	std::vector<Move> moves;
+	board.GetMoves(moves);
+
+	EXPECT_EQ(1, moves.size());
+	EXPECT_EQ(p2, moves[0].to);
 }

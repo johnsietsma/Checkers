@@ -18,7 +18,8 @@ namespace checkers
 class CheckersBoard
 {
 public:
-    enum class SideType { White, Black };
+	enum class WinType { White, Black, Draw };
+	enum class SideType { White, Black };
     enum class MoveError {	None, IsOutOfBounds, IsOccupied, IsNotDiagonal, IsNotAdjacent, NoJumpPiece, // 5
 							TooFar, NoPieceToMove, WrongSide, IsBackwards, MustJump
                          };
@@ -78,11 +79,21 @@ public:
 
 	bool IsFinished() const;
 
-	SideType GetWinner() const;
+	WinType GetWinner() const;
 
 private:
     /// Convert a Pos into an index into the board array.
     static int PosToIndex( const Pos &pos ) { return ( pos.row * NumberOfColumns ) + pos.column; }
+
+	SideType GetCurrentOpponentSide() const
+	{
+		return GetCurrentSide() == SideType::White ? SideType::Black : SideType::White;
+	}
+
+	static WinType GetWinTypeFromSideType(SideType side)
+	{
+		return side == SideType::White ? WinType::White : WinType::Black;
+	}
 
 	/// Get all the legal moves from startPos. Moves are made usingthe moveDeltas.
 	// Legal moves are added to the moves vector.
@@ -166,13 +177,25 @@ inline bool CheckersBoard::IsFinished() const
 	return !std::get<0>(sideHasPieces) || !std::get<1>(sideHasPieces);
 }
 
-inline CheckersBoard::SideType CheckersBoard::GetWinner() const
+inline CheckersBoard::WinType CheckersBoard::GetWinner() const
 {
 	auto sideHasPieces = GetSideHasPieces();
-	if (std::get<0>(sideHasPieces) && !std::get<1>(sideHasPieces)) { return SideType::White; }
-	if (!std::get<0>(sideHasPieces) && std::get<1>(sideHasPieces)) { return SideType::Black; }
+	if (!std::get<0>(sideHasPieces) && !std::get<1>(sideHasPieces)) { return WinType::Draw; } // Can't happen in normal game
+	if (std::get<0>(sideHasPieces) && !std::get<1>(sideHasPieces)) { return WinType::White; }
+	if (!std::get<0>(sideHasPieces) && std::get<1>(sideHasPieces)) { return WinType::Black; }
+	std::vector<Move> moves;
+	GetMoves(moves);
+	if (moves.empty()) return GetWinTypeFromSideType( GetCurrentOpponentSide() ); // Can't move means you lose
+
+	/*
+	TODO: Draw
+	Their next move they would create the same position for the third time during the game.
+	Neither player has advanced an uncrowned man towards the king-row during their own previous 40 moves.
+	No pieces have been removed from the board during their own previous 40 moves.
+	*/
+
 	assert(false && "No winner");
-	return SideType::White;
+	return WinType::Draw;
 }
 
 inline std::tuple<bool, bool> CheckersBoard::GetSideHasPieces() const

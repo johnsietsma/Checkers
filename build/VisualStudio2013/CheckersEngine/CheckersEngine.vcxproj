@@ -249,10 +249,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="E:\Source\Checkers\CheckersEngine\AIPlayer.h" />
     <ClInclude Include="E:\Source\Checkers\CheckersEngine\CheckersBoard.h" />
+    <ClInclude Include="E:\Source\Checkers\CheckersEngine\CheckersBoardNode.h" />
     <ClInclude Include="E:\Source\Checkers\CheckersEngine\Move.h" />
     <ClInclude Include="E:\Source\Checkers\CheckersEngine\Piece.h" />
     <ClInclude Include="E:\Source\Checkers\CheckersEngine\Pos.h" />
+    <ClCompile Include="E:\Source\Checkers\CheckersEngine\AIPlayer.cpp"  />
     <ClCompile Include="E:\Source\Checkers\CheckersEngine\CheckersBoard.cpp"  />
   </ItemGroup>
   <ItemGroup>

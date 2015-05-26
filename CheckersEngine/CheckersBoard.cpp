@@ -23,13 +23,13 @@ CheckersBoard::CheckersBoard( const PieceType pieceTypes[NumberOfSquares], SideT
 {
     for( int i=0; i<NumberOfSquares; i++ )
     {
-        m_pieces[i].pieceType = pieceTypes[i];
+        m_pieces[i] = Piece(pieceTypes[i], false);
     }
 }
 
 CheckersBoard::CheckersBoard(const CheckersBoard& board)
 {
-	memcpy(const_cast<Piece*>(board.m_pieces), m_pieces, sizeof(m_pieces));
+	memcpy(m_pieces, board.m_pieces, sizeof(m_pieces));
 	m_currentSide = board.m_currentSide;
 }
 
@@ -46,7 +46,7 @@ void CheckersBoard::GetMoves(std::vector<Move> &moves) const
 
 void CheckersBoard::GetMoves(const Pos &pos, std::vector<Move> &moves) const
 {
-	static const Pos moveDeltas[4] { Pos{ 1, 2 }, Pos{ -2, 2 }, Pos{ -2, -2 }, Pos{ 2, -2 } };
+	static const Pos moveDeltas[4] { Pos{ 1, 1 }, Pos{ -1, 1 }, Pos{ -1, -1 }, Pos{ 1, -1 } };
 	GetMoves(pos, moveDeltas, moves);
 }
 

@@ -313,6 +313,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="E:\Source\Checkers\CheckersEngineTests\AIPlayerTests.cpp"  />
     <ClCompile Include="E:\Source\Checkers\CheckersEngineTests\CheckersBoardTests.cpp"  />
     <ClCompile Include="E:\Source\Checkers\CheckersEngineTests\PosTests.cpp"  />
   </ItemGroup>

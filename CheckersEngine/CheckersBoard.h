@@ -136,7 +136,7 @@ inline void CheckersBoard::SetPiece( const Pos &pos, const Piece& piece )
 
 inline void CheckersBoard::SetPiece(const Pos &pos, Piece::PieceType pieceType)
 {
-	SetPiece(pos, pieceType);
+	SetPiece(pos, Piece(pieceType));
 }
 
 inline void CheckersBoard::RemovePiece(const Pos &pos)

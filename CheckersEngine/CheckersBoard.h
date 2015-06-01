@@ -50,6 +50,9 @@ public:
     /// Sets a piece at a given location.
     void SetPiece( const Pos &pos, const Piece& piece );
 
+	/// Sets a non-king piece at a given location with the given type.
+	void SetPiece(const Pos &pos, Piece::PieceType pieceType);
+
 	void RemovePiece( const Pos &pos );
 
 	/// Get all the legal moves that the current side can make.
@@ -121,7 +124,7 @@ private:
 
 inline Piece CheckersBoard::GetPiece( const Pos &pos ) const
 {
-    if ( IsOutOfBounds( pos ) ) { return Piece::PieceType::None; }
+    if ( IsOutOfBounds( pos ) ) { return Piece(Piece::PieceType::None); }
     return m_pieces[PosToIndex( pos )];
 }
 
@@ -129,6 +132,11 @@ inline void CheckersBoard::SetPiece( const Pos &pos, const Piece& piece )
 {
     if ( IsOutOfBounds( pos ) ) { assert( false && "Piece out of bounds" ); return; }
     m_pieces[PosToIndex( pos )] = piece;
+}
+
+inline void CheckersBoard::SetPiece(const Pos &pos, Piece::PieceType pieceType)
+{
+	SetPiece(pos, pieceType);
 }
 
 inline void CheckersBoard::RemovePiece(const Pos &pos)

@@ -7,7 +7,7 @@ struct Piece {
     enum class PieceType { None, White, Black };
 
     Piece() = default;
-	Piece(PieceType a_pieceType) : Piece(a_pieceType,false)
+	explicit Piece(const PieceType a_pieceType) : Piece(a_pieceType,false)
     {}
 
 	Piece(PieceType a_pieceType, bool a_isKing) :

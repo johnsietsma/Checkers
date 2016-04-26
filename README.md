@@ -1,7 +1,9 @@
 Checkers
 ========
 
-Checkers example project.
+A checkers example project.
+
+Contains the implementation of a Checkers engine (with no UI) that was built using Test Driven Development. It's intent is to demonstrate how TDD postively influences code design and robustness.
 
 * Building
 You can find a Microsoft Visual Studio 2013 project in the "build" folder.
